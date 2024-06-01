@@ -134,6 +134,8 @@ The bot uses systemd journal for logging. To view the logs, use:
 ```sh
 sudo journalctl -u discord-cleaner-bot -f
 ```
+![log](https://github.com/hitem/CleanBot/assets/8977898/7bd176cb-eaba-4bb1-b07c-1419157ce34c)
+
 ## Limitations
 Discord has 14 days message time limitation. If message is older then 14 days, quotas will be enforced - be patient, the bot will retry deleting old messages untill it has completed the task (can take awhile).
 
