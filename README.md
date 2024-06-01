@@ -8,6 +8,7 @@ A Discord bot that automatically cleans messages in specified channels after a c
 - Supports different cleaning intervals for different channels.
 - Commands to enable the cleaner, set cleaning intervals, and manually test the cleaner.
 - Permission checks to ensure only users with specified roles can execute commands.
+- The scheduled cleanup runs once per hour.
 
 ## Prerequisites
 
