@@ -109,25 +109,10 @@ A Discord bot that automatically cleans messages in specified channels after a c
   Manually test the cleaner in the current channel. `TIME` can be `all` to delete all messages or a number of hours.
 
 - `!checkpermissions`  
-  Check your permissions.
+  Check your permissions. This wont show rolename, but it will show your permission id.
 
 - `!listchannels`  
-  List all channels in the current guild.
-
-### Permissions
-
-Only users with roles listed in the `MODERATOR_ROLES` environment variable can execute the commands.
-
-### Environment Variables
-
-- `DISCORD_BOT_TOKEN`  
-  Your Discord bot token.
-
-- `STATE_FILE_PATH`  
-  Path to the state file where the bot saves its configuration for persistance settings.
-
-- `MODERATOR_ROLES`  
-  Comma-separated list of roles allowed to execute bot commands.
+  List all channels + channel_id on the current server (discord calls it guild).
 
 ## Logging
 
