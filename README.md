@@ -21,21 +21,19 @@ A Discord bot that automatically cleans messages in specified channels after a c
 
 ## Installation
 
-1. Update your package list and install Python and pip:
+1. Update your package list and install Python and pip if you dont have them already:
     ```sh
     sudo apt update
     sudo apt install python3 python3-pip
     ```
 
-2. Install the required Python packages:
+2. Clone this repository
+3. Install the required Python packages:
     ```sh
-    pip3 install discord.py
-    pip3 install pytz
+    pip3 install --upgrade -r requirements.txt
     ```
 
-3. Clone this repository.
-
-   Change following lines in `CleanBotman.py`:
+4. Change following lines in `CleanBotman.py`:
 
      - Set your timezone (the server where you are running the bot):
     ```sh
@@ -53,13 +51,13 @@ A Discord bot that automatically cleans messages in specified channels after a c
     MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
     ```
 
-4. Ensure the bot file and state file have the correct permissions:
+5. Ensure the bot file and state file have the correct permissions:
     ```sh
     chmod 755 /path/to/your/CleanBotman.py
     chmod 755 /path/to/your/cleaner_state.json
     ```
 
-5. Create a systemd service file to run the bot: (this will autostart the bot after server restart or downtime)
+6. Create a systemd service file to run the bot: (this will autostart the bot after server restart or downtime)
 
     ```sh
     sudo touch /etc/systemd/system/discord-cleaner-bot.service
@@ -88,14 +86,14 @@ A Discord bot that automatically cleans messages in specified channels after a c
 
     Replace `/path/to/your/` with the actual path to your bot file and state file, and `your_username` with your actual username of the account running the bot on server. And `your_bot_token_here` with your generated bot token from Discord Developer portal (see bottom of readme).
 
-6. Reload systemd to recognize the new service and start it:
+7. Reload systemd to recognize the new service and start it:
     ```sh
     sudo systemctl daemon-reload
     sudo systemctl start discord-cleaner-bot
     sudo systemctl enable discord-cleaner-bot
     ```
 
-7. **(Optional)**: Change the default timer for the cleaning job loop schedule. \
+8. **(Optional)**: Change the default timer for the cleaning job loop schedule. \
 Set your timer as desired; more frequent runs will result in more logs and higher resource consumption.
     ```sh
     # Define cleaning interval (Default 15min)

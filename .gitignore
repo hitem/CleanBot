@@ -1,3 +1,6 @@
 # ignores files
 /*.txt
 /*.jpg
+
+# exceptions
+!requirements.txt
