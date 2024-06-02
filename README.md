@@ -95,10 +95,11 @@ A Discord bot that automatically cleans messages in specified channels after a c
     sudo systemctl enable discord-cleaner-bot
     ```
 
-7. **(Optional)**: Change the default timer for cleaning job-loop schedule.\
-   Search for and change the following line
+7. **(Optional)**: Change the default timer for the cleaning job loop schedule. \
+Set your timer as desired; more frequent runs will result in more logs and higher resource consumption.
     ```sh
-    tasks.loop(minutes=15)
+    # Define cleaning interval (Default 15min)
+    CLEANING_INTERVAL_MINUTES = 15
     ```
 
 ## Usage
@@ -121,7 +122,7 @@ A Discord bot that automatically cleans messages in specified channels after a c
   List all channels + channel_id on the current server (discord calls it guild).
 
 - `!cleanersetting`  
-  Check if the cleaner is enabled and what the current timer setting is for the current channel. It returns "Cleaner is enabled and timer is set to xx hours" if enabled, otherwise it will state that the cleaner is not enabled for the channel
+  Check if the cleaner is enabled and what the current timer setting is for the current channel. It returns "Cleaner is enabled and timer is set to xx hours" if enabled, otherwise it will state that the cleaner is not enabled for the channel.
 
 ## Logging
 

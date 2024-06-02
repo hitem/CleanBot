@@ -29,8 +29,11 @@ CET = pytz.timezone('Europe/Stockholm')
 # File to store cleaner state
 STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'
 
-# List of roles allowed to execute commands
+# List of roles allowed to execute the commands
 MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
+
+# Define cleaning interval (Default 15min)
+CLEANING_INTERVAL_MINUTES = 15
 
 # Load initial state
 def load_state():
@@ -57,7 +60,7 @@ async def on_ready():
     logger.info(f'Logged in as {bot.user.name}')
     for channel_id in state.keys():
         if channel_id not in cleaning_tasks:
-            cleaning_tasks[channel_id] = tasks.loop(minutes=15)(clean_old_messages)
+            cleaning_tasks[channel_id] = tasks.loop(minutes=CLEANING_INTERVAL_MINUTES)(clean_old_messages)
         try:
             cleaning_tasks[channel_id].start(channel_id)
             logger.info(f"Started cleaner task for channel ID: {channel_id}")
@@ -112,7 +115,7 @@ async def enable_cleaner(ctx, channel_id: int):
             state[str(channel_id)] = {'time_to_keep': 24}  # Default to 24 hours
             save_state()
             if channel_id not in cleaning_tasks:
-                cleaning_tasks[channel_id] = tasks.loop(minutes=15)(clean_old_messages)
+                cleaning_tasks[channel_id] = tasks.loop(minutes=CLEANING_INTERVAL_MINUTES)(clean_old_messages)
             try:
                 cleaning_tasks[channel_id].start(channel_id)
             except RuntimeError:
