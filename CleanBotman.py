@@ -10,7 +10,7 @@ import pytz
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
 
 # Define intents
@@ -24,7 +24,7 @@ TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
 CET = pytz.timezone('Europe/Stockholm')
 
 # File to store cleaner state
-STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'
+STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'  # Update this path as needed
 
 # List of roles allowed to execute commands
 MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
@@ -56,6 +56,9 @@ cleaning_tasks = {}
 
 @bot.event
 async def on_ready():
+    logger.info("#############################################################")
+    logger.info("# Created by hitem       #github.com/hitem      CleanerBot  #")
+    logger.info("#############################################################")
     logger.info(f'Logged in as {bot.user.name}')
     for channel_id in state.keys():
         if channel_id not in cleaning_tasks:
@@ -76,7 +79,6 @@ async def on_command_error(ctx, error):
     else:
         logger.error(f"An error occurred: {error}")
 
-@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def clean_old_messages(channel_id):
     config = state.get(str(channel_id))
     if not config:
@@ -137,7 +139,6 @@ async def enable_cleaner_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         pass
     else:
-        await ctx.send(f"An error occurred: {error}")
         logger.error(f"An error occurred in enable_cleaner: {error}")
 
 @bot.command(name='setcleaningtime')
@@ -167,7 +168,6 @@ async def set_cleaning_time_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         pass
     else:
-        await ctx.send(f"An error occurred: {error}")
         logger.error(f"An error occurred in set_cleaning_time: {error}")
 
 @bot.command(name='testcleaner')
@@ -210,7 +210,6 @@ async def test_cleaner_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         pass
     else:
-        await ctx.send(f"An error occurred: {error}")
         logger.error(f"An error occurred in test_cleaner: {error}")
 
 @bot.command(name='cleanersetting')
@@ -230,7 +229,6 @@ async def cleaner_setting_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         pass
     else:
-        await ctx.send(f"An error occurred: {error}")
         logger.error(f"An error occurred in cleaner_setting: {error}")
 
 @bot.command(name='checkpermissions')
@@ -249,6 +247,7 @@ async def list_channels(ctx):
         for channel in guild.text_channels:
             channels_info += f"Channel: {channel.name} (ID: {channel.id})\n"
         await ctx.send(f"Channels in this guild:\n{channels_info}")
+        logger.info(f"{ctx.author} listed channels in guild {guild.id}")
     else:
         await ctx.send("You do not have the required permissions to use this command.")
         logger.warning(f"{ctx.author} tried to list channels without required permissions")
@@ -274,13 +273,17 @@ async def cleaner_help_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
         pass
     else:
-        await ctx.send(f"An error occurred: {error}")
         logger.error(f"An error occurred in cleaner_help: {error}")
 
 async def delete_messages(channel, time_limit):
     deleted_count = 0
+    messages_to_delete = []
 
-    async for message in channel.history(limit=None, before=time_limit):
+    async for message in channel.history(limit=None):
+        if time_limit is None or message.created_at < time_limit:
+            messages_to_delete.append(message)
+
+    for message in messages_to_delete:
         try:
             await message.delete()
             deleted_count += 1
