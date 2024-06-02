@@ -1,7 +1,4 @@
 # github.com/hitem
-# !enablecleaner CHANNEL_ID
-# !setcleaningtime TIME
-# !testcleaner TIME
 
 import os
 import discord
@@ -29,11 +26,13 @@ CET = pytz.timezone('Europe/Stockholm')
 # File to store cleaner state
 STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'
 
-# List of roles allowed to execute the commands
+# List of roles allowed to execute commands
 MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
 
-# Define cleaning interval (Default 15min)
+# Define cleaning interval and cooldowns
 CLEANING_INTERVAL_MINUTES = 15
+DEFAULT_COOLDOWN_SECONDS = 10
+HELP_COOLDOWN_SECONDS = 30
 
 # Load initial state
 def load_state():
@@ -71,10 +70,13 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
+        logger.warning(f"Command {ctx.message.content} not found.")
+    elif isinstance(error, commands.CommandOnCooldown):
         pass
     else:
         logger.error(f"An error occurred: {error}")
 
+@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def clean_old_messages(channel_id):
     config = state.get(str(channel_id))
     if not config:
@@ -109,6 +111,7 @@ def has_moderator_role(ctx):
     return any(role.name in MODERATOR_ROLES for role in ctx.author.roles)
 
 @bot.command(name='enablecleaner')
+@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def enable_cleaner(ctx, channel_id: int):
     if has_moderator_role(ctx):
         try:
@@ -131,10 +134,14 @@ async def enable_cleaner(ctx, channel_id: int):
 
 @enable_cleaner.error
 async def enable_cleaner_error(ctx, error):
-    await ctx.send(f"An error occurred: {error}")
-    logger.error(f"An error occurred in enable_cleaner: {error}")
+    if isinstance(error, commands.CommandOnCooldown):
+        pass
+    else:
+        await ctx.send(f"An error occurred: {error}")
+        logger.error(f"An error occurred in enable_cleaner: {error}")
 
 @bot.command(name='setcleaningtime')
+@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def set_cleaning_time(ctx, hours: int):
     if has_moderator_role(ctx):
         channel_id = ctx.channel.id
@@ -157,10 +164,14 @@ async def set_cleaning_time(ctx, hours: int):
 
 @set_cleaning_time.error
 async def set_cleaning_time_error(ctx, error):
-    await ctx.send(f"An error occurred: {error}")
-    logger.error(f"An error occurred in set_cleaning_time: {error}")
+    if isinstance(error, commands.CommandOnCooldown):
+        pass
+    else:
+        await ctx.send(f"An error occurred: {error}")
+        logger.error(f"An error occurred in set_cleaning_time: {error}")
 
 @bot.command(name='testcleaner')
+@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def test_cleaner(ctx, time: str):
     if has_moderator_role(ctx):
         channel_id = ctx.channel.id
@@ -196,10 +207,14 @@ async def test_cleaner(ctx, time: str):
 
 @test_cleaner.error
 async def test_cleaner_error(ctx, error):
-    await ctx.send(f"An error occurred: {error}")
-    logger.error(f"An error occurred in test_cleaner: {error}")
+    if isinstance(error, commands.CommandOnCooldown):
+        pass
+    else:
+        await ctx.send(f"An error occurred: {error}")
+        logger.error(f"An error occurred in test_cleaner: {error}")
 
 @bot.command(name='cleanersetting')
+@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def cleaner_setting(ctx):
     channel_id = str(ctx.channel.id)
     if channel_id in state:
@@ -212,16 +227,21 @@ async def cleaner_setting(ctx):
 
 @cleaner_setting.error
 async def cleaner_setting_error(ctx, error):
-    await ctx.send(f"An error occurred: {error}")
-    logger.error(f"An error occurred in cleaner_setting: {error}")
+    if isinstance(error, commands.CommandOnCooldown):
+        pass
+    else:
+        await ctx.send(f"An error occurred: {error}")
+        logger.error(f"An error occurred in cleaner_setting: {error}")
 
 @bot.command(name='checkpermissions')
+@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def check_permissions(ctx):
     permissions = ctx.author.guild_permissions
     await ctx.send(f"Your permissions: {permissions}")
     logger.info(f"{ctx.author} checked their permissions")
 
 @bot.command(name='listchannels')
+@commands.cooldown(1, DEFAULT_COOLDOWN_SECONDS, commands.BucketType.user)
 async def list_channels(ctx):
     if has_moderator_role(ctx):
         guild = ctx.guild
@@ -232,6 +252,30 @@ async def list_channels(ctx):
     else:
         await ctx.send("You do not have the required permissions to use this command.")
         logger.warning(f"{ctx.author} tried to list channels without required permissions")
+
+@bot.command(name='cleanerhelp')
+@commands.cooldown(1, HELP_COOLDOWN_SECONDS, commands.BucketType.user)
+async def cleaner_help(ctx):
+    help_text = (
+        "**Cleaner Bot Commands:**\n\n"
+        "- `!enablecleaner CHANNEL_ID` - Enable the cleaner for a specific channel.\n"
+        "- `!setcleaningtime HOURS` - Set the cleaning interval for the current channel. HOURS must be between 1 and 72.\n"
+        "- `!testcleaner TIME` - Manually test the cleaner. TIME can be 'all' or a number of hours.\n"
+        "- `!cleanersetting` - Check if the cleaner is enabled for the current channel and the cleaning interval.\n"
+        "- `!checkpermissions` - Check your permissions id.\n"
+        "- `!listchannels` - List all channels + channel_id.\n"
+        "- `!cleanerhelp` - List all cleaner commands.\n"
+    )
+    await ctx.send(help_text)
+    logger.info(f"{ctx.author} used cleanerhelp command")
+
+@cleaner_help.error
+async def cleaner_help_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        pass
+    else:
+        await ctx.send(f"An error occurred: {error}")
+        logger.error(f"An error occurred in cleaner_help: {error}")
 
 async def delete_messages(channel, time_limit):
     deleted_count = 0

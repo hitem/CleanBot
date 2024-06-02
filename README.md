@@ -9,6 +9,7 @@ A Discord bot that automatically cleans messages in specified channels after a c
 - Commands to enable the cleaner, set cleaning intervals, and manually test the cleaner.
 - Permission checks to ensure only users with specified roles can execute commands.
 - The scheduled cleanup runs every 15 minutes (Default).
+- Limit the amount of inputs to prevent spam/DoS type scenarios.
 
 ## Prerequisites
 
@@ -93,11 +94,16 @@ A Discord bot that automatically cleans messages in specified channels after a c
     sudo systemctl enable discord-cleaner-bot
     ```
 
-8. **(Optional)**: Change the default timer for the cleaning job loop schedule. \
+8. **(Optional)**: Change the default timer in `CleanBotman.py` for the cleaning job loop schedule. \
 Set your timer as desired; more frequent runs will result in more logs and higher resource consumption.
     ```sh
-    # Define cleaning interval (Default 15min)
     CLEANING_INTERVAL_MINUTES = 15
+    ```
+9. **(Optional)**: Change the default timer in `CleanBotman.py` for command usage. \
+  This is to prevent DoS like scenarios. Default/Help command.
+    ```sh
+    DEFAULT_COOLDOWN_SECONDS = 10
+    HELP_COOLDOWN_SECONDS = 30
     ```
 
 ## Usage
@@ -121,6 +127,9 @@ Set your timer as desired; more frequent runs will result in more logs and highe
 
 - `!cleanersetting`  
   Check if the cleaner is enabled and what the current timer setting is for the current channel. It returns "Cleaner is enabled and timer is set to xx hours" if enabled, otherwise it will state that the cleaner is not enabled for the channel.
+
+- `!cleanerhelp`  
+  Lists all the bot-commands available.
 
 ## Logging
 
