@@ -29,6 +29,9 @@ CET = pytz.timezone('Europe/Stockholm')
 # File to store cleaner state
 STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'
 
+# List of roles allowed to execute commands
+MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
+
 # Load initial state
 def load_state():
     if os.path.exists(STATE_FILE):
@@ -43,9 +46,6 @@ def load_state():
 
 state = load_state()
 
-# List of roles allowed to execute commands
-MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
-
 # Initialize bot with intents
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -57,13 +57,20 @@ async def on_ready():
     logger.info(f'Logged in as {bot.user.name}')
     for channel_id in state.keys():
         if channel_id not in cleaning_tasks:
-            cleaning_tasks[channel_id] = tasks.loop(hours=1)(clean_old_messages)
+            cleaning_tasks[channel_id] = tasks.loop(minutes=15)(clean_old_messages)
         try:
             cleaning_tasks[channel_id].start(channel_id)
             logger.info(f"Started cleaner task for channel ID: {channel_id}")
         except RuntimeError:
             logger.warning(f"Task for channel ID: {channel_id} is already running")
     logger.info("Bot is ready to receive commands")
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        pass
+    else:
+        logger.error(f"An error occurred: {error}")
 
 async def clean_old_messages(channel_id):
     config = state.get(str(channel_id))
@@ -105,7 +112,7 @@ async def enable_cleaner(ctx, channel_id: int):
             state[str(channel_id)] = {'time_to_keep': 24}  # Default to 24 hours
             save_state()
             if channel_id not in cleaning_tasks:
-                cleaning_tasks[channel_id] = tasks.loop(hours=1)(clean_old_messages)
+                cleaning_tasks[channel_id] = tasks.loop(minutes=15)(clean_old_messages)
             try:
                 cleaning_tasks[channel_id].start(channel_id)
             except RuntimeError:
@@ -188,6 +195,22 @@ async def test_cleaner(ctx, time: str):
 async def test_cleaner_error(ctx, error):
     await ctx.send(f"An error occurred: {error}")
     logger.error(f"An error occurred in test_cleaner: {error}")
+
+@bot.command(name='cleanersetting')
+async def cleaner_setting(ctx):
+    channel_id = str(ctx.channel.id)
+    if channel_id in state:
+        time_to_keep = state[channel_id]['time_to_keep']
+        await ctx.send(f"Cleaner is enabled for this channel. Cleaning time is set to {time_to_keep} hours.")
+        logger.info(f"{ctx.author} checked cleaner setting for channel ID: {channel_id} - enabled with {time_to_keep} hours")
+    else:
+        await ctx.send("Cleaner is not enabled for this channel.")
+        logger.info(f"{ctx.author} checked cleaner setting for channel ID: {channel_id} - not enabled")
+
+@cleaner_setting.error
+async def cleaner_setting_error(ctx, error):
+    await ctx.send(f"An error occurred: {error}")
+    logger.error(f"An error occurred in cleaner_setting: {error}")
 
 @bot.command(name='checkpermissions')
 async def check_permissions(ctx):

@@ -8,7 +8,7 @@ A Discord bot that automatically cleans messages in specified channels after a c
 - Supports different cleaning intervals for different channels.
 - Commands to enable the cleaner, set cleaning intervals, and manually test the cleaner.
 - Permission checks to ensure only users with specified roles can execute commands.
-- The scheduled cleanup runs once per hour.
+- The scheduled cleanup runs every 15 minutes (Default).
 
 ## Prerequisites
 
@@ -86,13 +86,19 @@ A Discord bot that automatically cleans messages in specified channels after a c
     WantedBy=multi-user.target
     ```
 
-    Replace `/path/to/your/` with the actual path to your bot file and state file, and `your_username` with your actual username of the account running the bot on server. And `your_bot_token_here` with your generated bot token from Discord Developer portal.
+    Replace `/path/to/your/` with the actual path to your bot file and state file, and `your_username` with your actual username of the account running the bot on server. And `your_bot_token_here` with your generated bot token from Discord Developer portal (see bottom of readme).
 
 6. Reload systemd to recognize the new service and start it:
     ```sh
     sudo systemctl daemon-reload
     sudo systemctl start discord-cleaner-bot
     sudo systemctl enable discord-cleaner-bot
+    ```
+
+7. **(Optional)**: Change the default timer for cleaning job-loop schedule.\
+   Search for and change the following line
+    ```sh
+    tasks.loop(minutes=15)
     ```
 
 ## Usage
@@ -109,10 +115,13 @@ A Discord bot that automatically cleans messages in specified channels after a c
   Manually test the cleaner in the current channel. `TIME` can be `all` to delete all messages or a number of hours.
 
 - `!checkpermissions`  
-  Check your permissions. This wont show rolename, but it will show your permission id.
+  Check your permissions. This won't show the role name, but it will show your permission ID.
 
 - `!listchannels`  
   List all channels + channel_id on the current server (discord calls it guild).
+
+- `!cleanersetting`  
+  Check if the cleaner is enabled and what the current timer setting is for the current channel. It returns "Cleaner is enabled and timer is set to xx hours" if enabled, otherwise it will state that the cleaner is not enabled for the channel
 
 ## Logging
 
@@ -123,7 +132,7 @@ sudo journalctl -u discord-cleaner-bot -f
 ![log](https://github.com/hitem/CleanBot/assets/8977898/7bd176cb-eaba-4bb1-b07c-1419157ce34c)
 
 ## Limitations
-Discord has 14 days message time limitation. If message is older then 14 days, quotas will be enforced - be patient, the bot will retry deleting old messages untill it has completed the task (can take awhile).
+Discord has 14 days message time limitation for bulk removal. If message is older then 14 days, request limitations will be enforced - be patient, the bot will retry deleting old messages untill it has completed the task (can take awhile due to the request limitation).
 
 ## Setup on Discord Developer Portal
 
@@ -148,5 +157,3 @@ Discord has 14 days message time limitation. If message is older then 14 days, q
     `Read Message History`
 4. Copy the generated URL and open it in your browser.
 5. Select the server you want to add the bot to and authorize it.
-
-
