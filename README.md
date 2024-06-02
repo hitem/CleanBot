@@ -37,12 +37,12 @@ A Discord bot that automatically cleans messages in specified channels after a c
 
    Change following lines in `CleanBotman.py`:
 
-     - Set your timezone:
+     - Set your timezone (the server where you are running the bot):
     ```sh
     # Define CET timezone
     CET = pytz.timezone('Europe/Stockholm')
     ```
-    - Set your path to the cleaner_state.json
+    - Set your path to the `cleaner_state.json`
     ```sh
     # File to store cleaner state
     STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'
@@ -59,7 +59,7 @@ A Discord bot that automatically cleans messages in specified channels after a c
     chmod 755 /path/to/your/cleaner_state.json
     ```
 
-5. Create a systemd service file to run the bot:
+5. Create a systemd service file to run the bot: (this will autostart the bot after server restart or downtime)
 
     ```sh
     sudo touch /etc/systemd/system/discord-cleaner-bot.service
