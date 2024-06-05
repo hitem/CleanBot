@@ -255,18 +255,36 @@ async def list_channels(ctx):
 @bot.command(name='cleanerhelp')
 @commands.cooldown(1, HELP_COOLDOWN_SECONDS, commands.BucketType.user)
 async def cleaner_help(ctx):
+    header = "**Cleaner Bot Commands**\n\n"
+    footer = "Feel free to ask for help if you need more information."
+    
     help_text = (
-        "**Cleaner Bot Commands:**\n\n"
         "- `!enablecleaner CHANNEL_ID` - Enable the cleaner for a specific channel.\n"
         "- `!setcleaningtime HOURS` - Set the cleaning interval for the current channel. HOURS must be between 1 and 72.\n"
         "- `!testcleaner TIME` - Manually test the cleaner. TIME can be 'all' or a number of hours.\n"
         "- `!cleanersetting` - Check if the cleaner is enabled for the current channel and the cleaning interval.\n"
         "- `!checkpermissions` - Check your permissions id.\n"
         "- `!listchannels` - List all channels + channel_id.\n"
-        "- `!cleanerhelp` - List all cleaner commands.\n"
+        "- `!cleanerhelp` - List all cleaner commands.\n\n"
     )
-    await ctx.send(help_text)
+
+    embed = discord.Embed(
+        title="Cleaner Bot Help",
+        description=header + help_text + footer,
+        colour=0x00FF00  # You can choose any color you like
+    )
+
+    embed = await attach_embed_info(ctx, embed)
+    
+    await ctx.send(embed=embed)
     logger.info(f"{ctx.author} used cleanerhelp command")
+
+async def attach_embed_info(ctx=None, embed=None):
+    embed.set_author(name="Cleaner Bot", icon_url=f"{ctx.guild.icon.url}")
+    embed.set_thumbnail(url=f"{ctx.guild.icon.url}")
+    embed.set_footer(text="by: hitem")
+    return embed
+
 
 @cleaner_help.error
 async def cleaner_help_error(ctx, error):
