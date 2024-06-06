@@ -8,6 +8,3 @@ name = "pypi"
 pytz = "==2021.1"
 
 [dev-packages]
-
-[requires]
-python_version = "3.11"
