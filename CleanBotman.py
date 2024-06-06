@@ -24,7 +24,7 @@ TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
 CET = pytz.timezone('Europe/Stockholm')
 
 # File to store cleaner state
-STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'  # Update this path as needed
+STATE_FILE = '/path/to/your/CleanBot/cleaner_state.json'  # Update this path as needed
 
 # List of roles allowed to execute commands
 MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed

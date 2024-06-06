@@ -15,100 +15,94 @@ A Discord bot that automatically cleans messages in specified channels after a c
 
 - A server to run the bot on
 - Python 3.6 or higher
-- Discord.py library
-- Pytz library
-- Linux system to run the bot (rasberry or similiar)
+- Linux system to run the bot (Raspberry Pi or similar)
 - App setup in Discord Developer portal (Scroll down to bottom to see how)
 
 ## Installation
 
-1. Update your package list and install Python and pip if you dont have them already:
+1. Ensure Python and pip are installed:
     ```sh
     sudo apt update
     sudo apt install python3 python3-pip
     ```
 
-2. Clone this repository
-3. Install the required Python packages:
+2. Clone this repository:
     ```sh
-    pip3 install --upgrade -r requirements.txt
+    git clone https://github.com/hitem/CleanBot.git
+    cd CleanBot
     ```
 
-4. Change following lines in `CleanBotman.py`:
-
-     - Set your timezone (the server where you are running the bot):
+3. Create and activate a virtual environment:
     ```sh
-    # Define CET timezone
-    CET = pytz.timezone('Europe/Stockholm')
-    ```
-    - Set your path to the `cleaner_state.json`
-    ```sh
-    # File to store cleaner state
-    STATE_FILE = '/path/to/your/bot/cleaner/cleaner_state.json'
-    ```
-    - and set the Roles on your Discord server you want to allow using the bot commands:
-    ```sh
-    # List of roles allowed to execute commands
-    MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
+    python3 -m venv venv
+    source venv/bin/activate
     ```
 
-5. Ensure the bot file and state file have the correct permissions:
+4. Install `pipenv` within the virtual environment:
     ```sh
-    chmod 755 /path/to/your/CleanBotman.py
-    chmod 755 /path/to/your/cleaner_state.json
+    pip install pipenv
     ```
 
-6. Create a systemd service file to run the bot: (this will autostart the bot after server restart or downtime)
-
+5. Install the required Python packages using `pipenv`:
     ```sh
-    sudo touch /etc/systemd/system/discord-cleaner-bot.service
+    pipenv install
+    ```
+
+6. Create a `.env` file following the format of `.env_example`. Add your DISCORD_BOT_TOKEN accordingly (make sure you have completed the Prerequisites)
+
+7. Run the bot:
+    ```sh
+    pipenv run python3 bot.py
+    ```
+
+## Running as a Service
+Here are some extra step to run your bot as a service on the server incase of reboot or similiar scenarios.
+
+1. Create a systemd service file:
+    ```sh
     sudo nano /etc/systemd/system/discord-cleaner-bot.service
     ```
 
-    Add the following content to the file:
-
+2. Add the following content to the file, make sure you change `/path/to/your/` to correct directory.
     ```ini
     [Unit]
     Description=Discord Cleaner Bot
     After=network.target
-
+    
     [Service]
-    ExecStart=/usr/bin/python3 /path/to/your/CleanBotman.py
-    WorkingDirectory=/path/to/your/
-    Restart=always
+    Type=simple
     User=your_username
-    Environment="DISCORD_BOT_TOKEN=your_bot_token_here"
+    WorkingDirectory=/path/to/your/CleanBot
+    ExecStart=/bin/bash -c 'source /path/to/your/CleanBot/venv/bin/activate && pipenv run python3 /path/to/your/CleanBot/CleanBotman.py'
+    Restart=on-failure
     StandardOutput=journal
     StandardError=journal
-
+    
     [Install]
     WantedBy=multi-user.target
     ```
 
-    Replace `/path/to/your/` with the actual path to your bot file and state file, and `your_username` with your actual username of the account running the bot on server. And `your_bot_token_here` with your generated bot token from Discord Developer portal (see bottom of readme).
-
-7. Reload systemd to recognize the new service and start it:
+3. Reload systemd to recognize the new service:
     ```sh
     sudo systemctl daemon-reload
-    sudo systemctl start discord-cleaner-bot
+    ```
+
+4. Enable the service to start on boot:
+    ```sh
     sudo systemctl enable discord-cleaner-bot
     ```
 
-8. **(Optional)**: Change the default timer in `CleanBotman.py` for the cleaning job loop schedule. \
-Set your timer as desired; more frequent runs will result in more logs and higher resource consumption.
+5. Start the service:
     ```sh
-    CLEANING_INTERVAL_MINUTES = 15
-    ```
-9. **(Optional)**: Change the default timer in `CleanBotman.py` for command usage. \
-  This is to prevent DoS like scenarios. Default/Help command.
-    ```sh
-    DEFAULT_COOLDOWN_SECONDS = 10
-    HELP_COOLDOWN_SECONDS = 30
+    sudo systemctl start discord-cleaner-bot
     ```
 
-## Usage
+6. Check the service status:
+    ```sh
+    sudo systemctl status discord-cleaner-bot
+    ```
 
-### Commands
+## Commands
 
 - `!enablecleaner CHANNEL_ID`  
   Enable the cleaner for a specific channel. The default cleaning interval is 24 hours.
@@ -137,10 +131,7 @@ The bot uses systemd journal for logging. To view the logs, use:
 ```sh
 sudo journalctl -u discord-cleaner-bot -f
 ```
-![log](https://github.com/hitem/CleanBot/assets/8977898/7bd176cb-eaba-4bb1-b07c-1419157ce34c)
 
-## Limitations
-Discord has 14 days message time limitation for bulk removal. If message is older then 14 days, request limitations will be enforced - be patient, the bot will retry deleting old messages untill it has completed the task (can take awhile due to the request limitation).
 
 ## Setup on Discord Developer Portal
 
@@ -157,11 +148,12 @@ Discord has 14 days message time limitation for bulk removal. If message is olde
 
 1. Go to the "OAuth2" section, then "URL Generator".
 2. Under "SCOPES", select "bot".
-3. Under "BOT PERMISSIONS", select the permissions your bot needs:\
-    `Manage Messages`\
-    `Read Messages`\
-    `Send Messages`\
-    `View Channels`\
-    `Read Message History`
+3. Under "BOT PERMISSIONS", select the permissions your bot needs:
+    - `Manage Messages`
+    - `Read Messages`
+    - `Send Messages`
+    - `View Channels`
+    - `Read Message History`
 4. Copy the generated URL and open it in your browser.
 5. Select the server you want to add the bot to and authorize it.
+
