@@ -63,7 +63,7 @@ Here are some extra step to run your bot as a service on the server incase of re
     sudo nano /etc/systemd/system/discord-cleaner-bot.service
     ```
 
-2. Add the following content to the file, make sure you change `/path/to/your/` to correct directory.
+2. Add the following content to the file, make sure you change `/path/to/your/` to correct directory and username.
     ```ini
     [Unit]
     Description=Discord Cleaner Bot
