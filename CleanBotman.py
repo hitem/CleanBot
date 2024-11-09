@@ -27,7 +27,7 @@ CET = pytz.timezone('Europe/Stockholm')
 STATE_FILE = '/path/to/your/CleanBot/cleaner_state.json'  # Update this path as needed
 
 # List of roles allowed to execute commands
-MODERATOR_ROLES = ["Admins", "Super Friends"]  # Add role names as needed
+MODERATOR_ROLES = {"Admins", "Super Friends"}  # Add role names as needed
 
 # Define cleaning interval and cooldowns
 CLEANING_INTERVAL_MINUTES = 15
