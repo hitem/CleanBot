@@ -138,11 +138,12 @@ sudo journalctl -u discord-cleaner-bot -f
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
 2. Click on "New Application".
 3. Enter a name for your bot and click "Create".
-4. Go to the "Bot" section and click "Add Bot".
-5. Click "Yes, do it!" to confirm.
-6. Under the "Token" section, click "Copy" to copy your bot token. This will be used as the `DISCORD_BOT_TOKEN` environment variable.
-7. Under "Privileged Gateway Intents", enable "Message Content Intent".
-8. Save your changes.
+4. (optional) If you are intending the bot to be private, go to Oauth2 section and flip the install link to "none" and only have "guild install" selected above.
+5. Go to the "Bot" section.
+6. (optional) If you are intending for the bot to be private, untick the "public bot"
+7. Under the "Token" section, click "Copy" to copy your bot token (might need re-generation). This will be used as the `DISCORD_BOT_TOKEN` environment variable.
+8. Under "Privileged Gateway Intents", enable "Message Content Intent".
+9. Save your changes.
 
 ### Invite the Bot to Your Server
 

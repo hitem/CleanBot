@@ -1,6 +1,22 @@
-# ignores files
-/*.txt
-/*.jpg
+# ─── Python virtualenv ─────────────────────────────────────────────────────────
+venv/
 
-# exceptions
+# ─── Local secrets ──────────────────────────────────────────────────────────────
+.env
+
+# ─── Bot runtime state & caches ─────────────────────────────────────────────────
+state.json
+*atomic*                 # any atomic‐write temp files
+
+# ─── Python bytecode & IDE cruft ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.swp                    # Vim swapfiles, etc
+
+# ─── Ignore .txt and .jpg assets by default, but keep requirements.txt ─────────
+*.txt
+*.jpg
 !requirements.txt
+
+# ─── (optionally) lockfiles if you don't want to commit them ───────────────────
+# Pipfile.lock           # uncomment if you want to ignore Pipfile.lock too
