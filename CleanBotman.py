@@ -109,7 +109,7 @@ async def clean_old_messages(channel_id):
     if deleted_count > 0:
         logger.info(f"Cleaned {deleted_count} messages in channel {channel_id}")
     else:
-        logger.info(f"No messages to clean in channel {channel_id}")
+        logger.debug(f"No messages to clean in channel {channel_id}")
 
 def has_moderator_role(ctx):
     return any(role.name in MODERATOR_ROLES for role in ctx.author.roles)
