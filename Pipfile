@@ -5,6 +5,6 @@ name = "pypi"
 
 [packages]
 "discord.py" = "*"
-pytz = "==2021.1"
+pytz = "*"
 
 [dev-packages]
