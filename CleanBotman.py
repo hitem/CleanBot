@@ -12,15 +12,14 @@ import pytz
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] [%(name)s]: %(message)s')
-logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s]: %(message)s')
+logger = logging.getLogger()
 
 # Redirect all discord.* logs through our root handler
-for lib in ('discord', 'discord.client', 'discord.gateway', 'discord.http'):
-    lib_logger = logging.getLogger(lib)
-    lib_logger.handlers.clear()      # drop their padded‐format handlers
-    lib_logger.propagate = True      # send everything up to root
-    lib_logger.setLevel(logging.INFO)  # or WARNING if you only want warnings+
+logging.getLogger("discord.gateway").setLevel(logging.WARNING)
+logging.getLogger("discord.client").setLevel(logging.WARNING)
+logging.getLogger("discord.http").setLevel(logging.WARNING)
+logging.getLogger("discord.ext.commands").setLevel(logging.ERROR)
 
 # Define intents
 intents = discord.Intents.default()
@@ -33,7 +32,7 @@ TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
 CET = pytz.timezone('Europe/Stockholm')
 
 # File to store cleaner state
-STATE_FILE = '/path/to/your/CleanBot/cleaner_state.json'  # Update this path as needed
+STATE_FILE = 'cleaner_state.json'  # Update this path as needed
 
 # List of roles allowed to execute commands
 MODERATOR_ROLES = {"Admins", "Super Friends"}  # Add role names as needed
