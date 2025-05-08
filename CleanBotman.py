@@ -12,8 +12,15 @@ import pytz
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] [%(name)s]: %(message)s')
 logger = logging.getLogger(__name__)
+
+# Redirect all discord.* logs through our root handler
+for lib in ('discord', 'discord.client', 'discord.gateway', 'discord.http'):
+    lib_logger = logging.getLogger(lib)
+    lib_logger.handlers.clear()      # drop their padded‐format handlers
+    lib_logger.propagate = True      # send everything up to root
+    lib_logger.setLevel(logging.INFO)  # or WARNING if you only want warnings+
 
 # Define intents
 intents = discord.Intents.default()
